@@ -1,0 +1,551 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="pg-container" style="padding-top: 24px; padding-bottom: 80px;">
+
+    <!-- DASHBOARD HEADER -->
+    <div class="dash-header reveal">
+        <div
+            style="display: flex; align-items: flex-start; justify-content: space-between; gap: 24px; flex-wrap: wrap;">
+            <div>
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 10px; flex-wrap: wrap;">
+                    <span class="badge badge-success">
+                        <i class="fa-solid fa-check-circle" style="color: var(--success);"></i>
+                        Matches Found
+                    </span>
+                </div>
+                <h1 style="font-size: clamp(1.6rem, 4vw, 2.4rem); margin-bottom: 8px;">
+                    Your Benefit <span class="text-gradient">Matches</span>
+                </h1>
+                <p style="color: var(--text-muted); font-size: 15px;">
+                    We found <strong style="color: var(--text-primary);">{{ schemes|length }}</strong>
+                    government schemes that you may qualify for based on your profile.
+                </p>
+            </div>
+
+            <div style="display: flex; gap: 10px; align-items: center; flex-shrink: 0;">
+                <button onclick="window.print()" class="btn btn-ghost btn-sm">
+                    <i class="fa-solid fa-file-pdf" style="color: var(--error);"></i> Export PDF
+                </button>
+                <a href="/" class="btn btn-secondary btn-sm">
+                    <i class="fa-solid fa-sliders"></i> Refine Profile
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- DASHBOARD GRID -->
+    <div class="dashboard-layout">
+
+        <!-- ── LEFT SIDEBAR ──────────────────────────── -->
+        <div class="sidebar-sticky">
+
+            <!-- Match Summary Panel -->
+            <div class="sidebar-panel"
+                style="border-color: var(--primary-border); background: linear-gradient(135deg, rgba(79,70,229,0.06), transparent);">
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;">
+                    <div style="display: flex; align-items: center; gap: 10px;">
+                        <div
+                            style="width: 34px; height: 34px; border-radius: 10px; background: var(--primary); display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                            <i class="fa-solid fa-wand-magic-sparkles" style="color: white; font-size: 14px;"></i>
+                        </div>
+                        <div>
+                            <div
+                                style="font-size: 14px; font-weight: 700; color: var(--text-primary); line-height: 1.2;">
+                                Match Summary</div>
+                            <div
+                                style="font-size: 10px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em;">
+                                Personalized For You</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    style="background: rgba(0,0,0,0.2); border-radius: 10px; padding: 12px; border: 1px solid var(--border-subtle); margin-bottom: 14px;">
+                    <p style="font-size: 13px; color: rgba(255,255,255,0.8); line-height: 1.6;" id="ai-insight-text">
+                        {% if schemes %}
+                        Based on your profile, we identified {{ schemes|length }} schemes that could provide you with
+                        financial assistance or support. Check the details below to apply.
+                        {% else %}
+                        We couldn't find an exact match for your current profile. Try adjusting your details or check
+                        back later as new schemes are added.
+                        {% endif %}
+                    </p>
+                </div>
+            </div>
+
+            <!-- Financial Impact Panel -->
+            <div class="sidebar-panel" style="margin-top: 12px;">
+                <div class="sidebar-panel-title">Annual Capital Allocation</div>
+                <div style="display: flex; align-items: baseline; gap: 10px; margin-bottom: 16px;">
+                    <span
+                        style="font-size: 2rem; font-weight: 900; color: var(--text-primary); font-family: 'JetBrains Mono', monospace; line-height: 1;"
+                        id="total-benefit-display">₹0</span>
+                    <span class="badge badge-success">Max Eligible</span>
+                </div>
+
+                <div
+                    style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; padding-top: 14px; border-top: 1px solid var(--border-subtle);">
+                    <div>
+                        <div class="font-mono"
+                            style="font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px;">
+                            Monthly Yield</div>
+                        <div style="font-size: 1.2rem; font-weight: 800; color: var(--text-primary); font-family: 'JetBrains Mono', monospace;"
+                            id="monthly-benefit-display">₹0</div>
+                    </div>
+                    <div>
+                        <div class="font-mono"
+                            style="font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 4px;">
+                            Avg / Scheme</div>
+                        <div style="font-size: 1.2rem; font-weight: 800; color: var(--text-muted); font-family: 'JetBrains Mono', monospace;"
+                            id="avg-benefit-display">₹0</div>
+                    </div>
+                </div>
+
+                <div
+                    style="display: flex; align-items: center; justify-content: space-between; margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--border-subtle);">
+                    <span class="font-mono"
+                        style="font-size: 9px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 0.1em; font-weight: 700;">Schemes
+                        Matched</span>
+                    <span class="font-mono" style="font-size: 16px; font-weight: 900; color: var(--text-primary);">{{
+                        schemes|length }}</span>
+                </div>
+            </div>
+
+            <!-- Next Steps Panel -->
+            <div class="sidebar-panel" style="margin-top: 12px;">
+                <div class="sidebar-panel-title">What to do next?</div>
+                <div style="font-size: 13px; color: var(--text-muted); line-height: 1.6; margin-bottom: 12px;">
+                    1. Review the details for each matched scheme.<br>
+                    2. Check the required documents list.<br>
+                    3. Click "Apply Now" to visit the official portal and submit your application.
+                </div>
+                <a href="/#how-it-works"
+                    style="font-size: 12px; color: var(--primary-light); text-decoration: none; font-weight: 600; display: block; margin-bottom: 8px;">Need
+                    Help? Read the Guide <i class="fa-solid fa-arrow-right"></i></a>
+                <a href="/team"
+                    style="font-size: 12px; color: var(--text-muted); text-decoration: none; font-weight: 600; display: block;">
+                    <i class="fa-solid fa-users"></i> Meet the Architects</a>
+            </div>
+
+        </div><!-- end sidebar -->
+
+        <!-- ── RIGHT COLUMN: SCHEME CARDS ─────────────── -->
+        <div style="flex: 1; min-width: 0;">
+
+            <style>
+                /* Inline Analytics Styles to ensure no cache issues */
+                .analytics-grid {
+                    display: grid;
+                    grid-template-columns: 1fr 1fr;
+                    gap: 16px;
+                }
+
+                .chart-card {
+                    background: var(--bg-card);
+                    border: 1px solid var(--border-light);
+                    border-radius: var(--r-lg);
+                    padding: 20px;
+                    backdrop-filter: blur(12px);
+                    position: relative;
+                    overflow: hidden;
+                    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+                }
+
+                .chart-card::before {
+                    content: '';
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    width: 100%;
+                    height: 2px;
+                    background: linear-gradient(90deg, var(--primary), var(--accent), var(--success));
+                    opacity: 0.8;
+                }
+
+                .chart-title {
+                    font-size: 13px;
+                    font-weight: 800;
+                    color: var(--text-primary);
+                    text-transform: uppercase;
+                    letter-spacing: 0.05em;
+                    margin-bottom: 16px;
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                }
+
+                .chart-container {
+                    position: relative;
+                    height: 220px;
+                    width: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                }
+
+                @media (max-width: 768px) {
+                    .analytics-grid {
+                        grid-template-columns: 1fr;
+                    }
+                }
+            </style>
+
+            <!-- ANALYTICS DASHBOARD -->
+            <div class="analytics-dashboard reveal" style="margin-bottom: 24px;">
+                <h3 style="margin-bottom: 20px; font-size: 1.4rem; display: flex; align-items: center; gap: 10px;">
+                    <div
+                        style="width: 36px; height: 36px; border-radius: 10px; background: linear-gradient(135deg, var(--primary), var(--accent)); display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 15px var(--primary-glow);">
+                        <i class="fa-solid fa-chart-line" style="color: white;"></i>
+                    </div>
+                    AI Analytics & Insights
+                </h3>
+                <div class="analytics-grid">
+                    <div class="chart-card">
+                        <div class="chart-title"><i class="fa-solid fa-layer-group" style="color: var(--primary);"></i>
+                            Category Spread</div>
+                        <div class="chart-container">
+                            <canvas id="categoryChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-title"><i class="fa-solid fa-ranking-star" style="color: var(--warning);"></i>
+                            Benefit Focus</div>
+                        <div class="chart-container">
+                            <canvas id="benefitChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+                <div class="analytics-grid" style="margin-top: 16px;">
+                    <div class="chart-card" style="grid-column: 1 / -1;">
+                        <div class="chart-title"><i class="fa-solid fa-bolt" style="color: var(--accent);"></i> Match
+                            Score Comparison (Top 5)</div>
+                        <div class="chart-container" style="height: 260px;">
+                            <canvas id="scoreChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter Pills -->
+            <div class="filter-row reveal">
+                <button class="filter-pill active" data-cat="all">
+                    All <span
+                        style="margin-left: 4px; padding: 2px 6px; background: rgba(255,255,255,0.1); border-radius: 4px; font-size: 10px;">{{
+                        schemes|length }}</span>
+                </button>
+                {% for cat in ['Education', 'Health', 'Housing', 'Agriculture', 'Women', 'Youth', 'Employment',
+                'Pension'] %}
+                <button class="filter-pill" data-cat="{{ cat }}">{{ cat }}</button>
+                {% endfor %}
+            </div>
+
+            <!-- Scheme Cards -->
+            <div class="space-y-3" id="scheme-list">
+                {% for scheme in schemes %}
+                <div class="scheme-card {% if loop.index == 1 %}top-match{% endif %} reveal scheme-item"
+                    data-cat="{{ scheme.category if scheme.category is defined else scheme.schemeCategory if scheme.schemeCategory is defined else 'General' }}"
+                    style="animation-delay: {{ loop.index0 * 0.04 }}s;">
+
+                    {% if loop.index == 1 %}
+                    <div class="scheme-top-badge">⚡ Top Match</div>
+                    {% endif %}
+
+                    <!-- Icon -->
+                    <div class="scheme-score-ring" style="min-width: 48px;">
+                        <div
+                            style="width: 42px; height: 42px; border-radius: 50%; background: rgba(59, 130, 246, 0.1); display: flex; align-items: center; justify-content: center;">
+                            <i class="fa-solid fa-check" style="color: var(--success); font-size: 18px;"></i>
+                        </div>
+                    </div>
+
+                    <!-- Body -->
+                    <div class="scheme-body">
+                        <div class="scheme-name">{{ scheme.scheme_name }}</div>
+
+                        <div class="scheme-badges">
+                            {% set cat_val = scheme.category if scheme.category is defined and scheme.category else
+                            scheme.schemeCategory if scheme.schemeCategory is defined and scheme.schemeCategory else
+                            'General' %}
+                            <span class="badge badge-primary">{{ cat_val }}</span>
+                            {% if scheme.state is defined and scheme.state %}
+                            <span class="badge badge-neutral">{{ scheme.state }}</span>
+                            {% endif %}
+                            {% if scheme.verified is defined and scheme.verified %}
+                            <span class="badge badge-success">
+                                <i class="fa-solid fa-circle-check" style="font-size: 8px;"></i> Verified
+                            </span>
+                            {% endif %}
+                        </div>
+
+                        <p class="scheme-desc">{{ scheme.details }}</p>
+
+                        {% if scheme.ai_explanation is defined and scheme.ai_explanation %}
+                        <p
+                            style="font-size: 12px; color: var(--text-primary); margin-bottom: 12px; line-height: 1.5; background: rgba(255,255,255,0.03); padding: 8px 12px; border-radius: 6px;">
+                            <i class="fa-solid fa-lightbulb" style="margin-right: 6px; color: var(--warning);"></i>
+                            {{ scheme.ai_explanation }}
+                        </p>
+                        {% endif %}
+
+                        <!-- Match bar -->
+                        <div class="match-bar-track">
+                            <div class="match-bar-fill" data-width="{{ scheme.eligibility_score }}"></div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="scheme-actions"
+                            style="margin-top: 14px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center;">
+                            <a href="https://www.google.com/search?q={{ scheme.scheme_name | urlencode }}+apply+online"
+                                target="_blank" rel="noopener" class="btn btn-primary btn-sm">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i> Apply Now
+                            </a>
+                            <a href="https://www.google.com/search?q={{ scheme.scheme_name | urlencode }}+required+documents"
+                                target="_blank" rel="noopener" class="btn btn-ghost btn-sm" title="Required Documents">
+                                <i class="fa-solid fa-file-lines"></i> Documents
+                            </a>
+                            <button type="button" class="btn btn-secondary btn-sm" onclick="toggleExplain(this)"
+                                style="margin-left: auto;">
+                                <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--primary);"></i> Explain
+                                My Result
+                            </button>
+                            {% if scheme.documents is defined and scheme.documents %}
+                            <span style="font-size: 11px; color: var(--text-dim); margin-left: 4px;">
+                                {{ scheme.documents|length }} docs needed
+                            </span>
+                            {% endif %}
+                        </div>
+
+                        <!-- AI Explain Box (Hidden by default) -->
+                        <div class="explain-box"
+                            style="display: none; margin-top: 16px; padding: 16px; background: var(--bg-surface); border: 1px solid var(--border-light); border-radius: var(--r-md); animation: fadeIn 0.3s ease;">
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+                                <i class="fa-solid fa-brain" style="color: var(--primary);"></i>
+                                <span style="font-weight: 700; font-size: 13px; color: var(--text-primary);">AI Match
+                                    Analysis</span>
+                            </div>
+                            <p
+                                style="font-size: 13px; color: var(--text-muted); margin-bottom: 12px; line-height: 1.5;">
+                                This scheme matched your profile perfectly based on the matching parameters. The weights
+                                indicate how strongly each attribute influenced the final {{ scheme.eligibility_score
+                                }}% match score.</p>
+
+                            <div class="explain-factors" style="display: flex; flex-direction: column; gap: 8px;">
+                                <div
+                                    style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: rgba(255,255,255,0.03); border-radius: 6px; border-left: 3px solid var(--success);">
+                                    <span
+                                        style="font-size: 12px; font-weight: 600; color: var(--text-secondary);">Income
+                                        Level</span>
+                                    <span class="badge badge-success">High Weight</span>
+                                </div>
+                                <div
+                                    style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: rgba(255,255,255,0.03); border-radius: 6px; border-left: 3px solid var(--warning);">
+                                    <span
+                                        style="font-size: 12px; font-weight: 600; color: var(--text-secondary);">Social
+                                        Category</span>
+                                    <span class="badge badge-warning">Medium Weight</span>
+                                </div>
+                                <div
+                                    style="display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: rgba(255,255,255,0.03); border-radius: 6px; border-left: 3px solid var(--primary);">
+                                    <span style="font-size: 12px; font-weight: 600; color: var(--text-secondary);">State
+                                        / Region</span>
+                                    <span class="badge badge-primary">High Weight</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </div><!-- end scheme-card -->
+                {% endfor %}
+
+                {% if not schemes %}
+                <div class="empty-state">
+                    <div class="empty-state-icon"><i class="fa-solid fa-magnifying-glass"></i></div>
+                    <h3 style="color: var(--text-primary); margin-bottom: 10px;">No Schemes Found</h3>
+                    <p>No schemes matched your current profile. Try broadening your eligibility parameters.</p>
+                    <a href="/" class="btn btn-primary">
+                        <i class="fa-solid fa-sliders"></i> Refine Profile
+                    </a>
+                </div>
+                {% endif %}
+            </div><!-- end scheme-list -->
+
+        </div><!-- end right column -->
+
+    </div><!-- end dashboard-layout -->
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Pass financial data from Flask to JS
+    const FINANCIAL_DATA = {
+        total: {{ financial_summary.total_benefit if financial_summary else 0 }},
+    monthly: { { financial_summary.monthly_estimate if financial_summary else 0 } },
+    count: { { financial_summary.scheme_count if financial_summary else 0 } }
+    };
+
+    // Toggle Explain Box Function
+    function toggleExplain(btn) {
+        const box = btn.closest('.scheme-body').querySelector('.explain-box');
+        if (box.style.display === 'none') {
+            box.style.display = 'block';
+            btn.innerHTML = '<i class="fa-solid fa-times"></i> Close Explanation';
+        } else {
+            box.style.display = 'none';
+            btn.innerHTML = '<i class="fa-solid fa-wand-magic-sparkles" style="color: var(--primary);"></i> Explain My Result';
+        }
+    }
+
+    // Chart.js Analytics Implementation
+    document.addEventListener("DOMContentLoaded", () => {
+        const schemeItems = document.querySelectorAll('.scheme-item');
+        const categories = {};
+        const catScores = {};
+        const schemeScores = [];
+
+        schemeItems.forEach((item, index) => {
+            const cat = item.getAttribute('data-cat') || 'General';
+            categories[cat] = (categories[cat] || 0) + 1;
+
+            const nameEl = item.querySelector('.scheme-name');
+            const scoreEl = item.querySelector('.match-bar-fill');
+            const score = parseInt(scoreEl ? scoreEl.getAttribute('data-width') : 0);
+
+            catScores[cat] = (catScores[cat] || 0) + score;
+
+            if (index < 5 && nameEl) {
+                let name = nameEl.textContent.trim();
+                if (name.length > 28) name = name.substring(0, 28) + '...';
+                schemeScores.push({ name, score });
+            }
+        });
+
+        // Ensure charts render securely
+        if (typeof Chart === 'undefined') {
+            console.error("Chart.js failed to load!");
+            document.querySelectorAll('.chart-container').forEach(el => {
+                el.innerHTML = '<div style="color:var(--text-muted); font-size:12px; text-align:center;">Analytic Data Unavailable</div>';
+            });
+            return;
+        }
+
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark' || !document.documentElement.getAttribute('data-theme');
+        const textColor = isDark ? '#94A3B8' : '#475569';
+        const gridColor = isDark ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.08)';
+
+        Chart.defaults.color = textColor;
+        Chart.defaults.font.family = "'Inter', 'JetBrains Mono', sans-serif";
+        const themeColors = ['#FF8A00', '#2563EB', '#10B981', '#F59E0B', '#8B5CF6', '#EC4899'];
+
+        // 1. Category Distribution (Radial Polar Area for "Graphical/Interesting" look instead of basic bar)
+        const catCtx = document.getElementById('categoryChart');
+        if (catCtx && Object.keys(categories).length > 0) {
+            new Chart(catCtx, {
+                type: 'polarArea',
+                data: {
+                    labels: Object.keys(categories),
+                    datasets: [{
+                        label: 'Schemes',
+                        data: Object.values(categories),
+                        backgroundColor: themeColors.map(c => c + '99'), // add 60% opacity
+                        borderColor: themeColors,
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right', labels: { boxWidth: 10, font: { size: 11 } } },
+                        tooltip: { backgroundColor: 'rgba(14,22,38,0.95)', padding: 12, cornerRadius: 8, titleFont: { size: 13 }, bodyFont: { size: 12 } }
+                    },
+                    scales: {
+                        r: { ticks: { display: false }, grid: { color: gridColor }, angleLines: { color: gridColor } }
+                    }
+                }
+            });
+        }
+
+        // 2. Benefit Distribution (Donut Chart with high-end glow)
+        const benCtx = document.getElementById('benefitChart');
+        if (benCtx && Object.keys(catScores).length > 0) {
+            new Chart(benCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(catScores),
+                    datasets: [{
+                        data: Object.values(catScores),
+                        backgroundColor: themeColors,
+                        borderWidth: 0,
+                        hoverOffset: 6,
+                        hoverBorderWidth: 2,
+                        hoverBorderColor: '#fff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: { position: 'right', labels: { boxWidth: 10, font: { size: 11 } } },
+                        tooltip: { backgroundColor: 'rgba(14,22,38,0.95)', padding: 12, cornerRadius: 8 }
+                    },
+                    cutout: '72%',
+                    animation: { animateScale: true, animateRotate: true }
+                }
+            });
+        }
+
+        // 3. Match Score Comparison (Elegant Horizontal Bar Chart with Gradients)
+        const scoreCtx = document.getElementById('scoreChart');
+        if (scoreCtx && schemeScores.length > 0) {
+            // Create Gradient
+            const ctx = scoreCtx.getContext('2d');
+            let gradient = null;
+            if (ctx) {
+                gradient = ctx.createLinearGradient(0, 0, 400, 0);
+                gradient.addColorStop(0, '#2563EB'); // var(--accent)
+                gradient.addColorStop(1, '#FF8A00'); // var(--primary)
+            }
+
+            new Chart(scoreCtx, {
+                type: 'bar',
+                data: {
+                    labels: schemeScores.map(s => s.name),
+                    datasets: [{
+                        label: 'Match Score %',
+                        data: schemeScores.map(s => s.score),
+                        backgroundColor: gradient || '#2563EB',
+                        borderRadius: 6,
+                        barPercentage: 0.5,
+                        minBarLength: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    indexAxis: 'y', // Horizontal
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(14,22,38,0.95)',
+                            padding: 12,
+                            cornerRadius: 8,
+                            callbacks: {
+                                label: function (context) { return " Score: " + context.raw + "%"; }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: { beginAtZero: true, max: 100, grid: { color: gridColor, drawBorder: false }, ticks: { font: { size: 11, family: 'JetBrains Mono' }, callback: value => value + '%' } },
+                        y: { grid: { display: false, drawBorder: false }, ticks: { font: { size: 12, weight: 'bold' } } }
+                    },
+                    animation: {
+                        duration: 1500,
+                        easing: 'easeOutQuart'
+                    }
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

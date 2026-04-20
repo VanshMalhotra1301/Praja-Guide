@@ -1,0 +1,372 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* PREMIUM LANDING PAGE STYLES */
+
+    /* Canvas Animation Background */
+    #network-canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        opacity: 0.6;
+        pointer-events: none;
+    }
+
+    .hero-landing {
+        position: relative;
+        padding: 160px 0 100px;
+        min-height: 90vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        overflow: hidden;
+    }
+
+    .hero-landing::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(circle at 50% 30%, rgba(255, 138, 0, 0.12), transparent 70%);
+        z-index: 0;
+    }
+
+    .hero-content {
+        position: relative;
+        z-index: 2;
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 0 20px;
+    }
+
+    .hero-title {
+        font-size: clamp(3rem, 6vw, 5.5rem);
+        font-weight: 800;
+        line-height: 1.1;
+        margin-bottom: 24px;
+        letter-spacing: -0.02em;
+    }
+
+    .hero-title .highlight {
+        background: linear-gradient(135deg, var(--primary-light), var(--accent));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        display: inline-block;
+    }
+
+    .hero-subtitle {
+        font-size: clamp(1.1rem, 2vw, 1.4rem);
+        color: var(--text-muted);
+        max-width: 700px;
+        margin: 0 auto 40px;
+        line-height: 1.6;
+    }
+
+    .cta-group {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+        flex-wrap: wrap;
+    }
+
+    .btn-xl {
+        padding: 18px 40px;
+        font-size: 1.1rem;
+        border-radius: 50px;
+    }
+
+    /* Feature Showcase */
+    .showcase-section {
+        padding: 100px 0;
+        position: relative;
+        z-index: 1;
+    }
+
+    .showcase-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 40px;
+        margin-top: 60px;
+    }
+
+    .showcase-card {
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid var(--border-subtle);
+        border-radius: var(--r-2xl);
+        padding: 40px;
+        text-align: left;
+        transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+        overflow: hidden;
+        backdrop-filter: blur(10px);
+    }
+
+    .showcase-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent);
+        z-index: 0;
+        opacity: 0;
+        transition: opacity 0.4s;
+    }
+
+    .showcase-card:hover {
+        transform: translateY(-8px);
+        border-color: var(--primary-border);
+        box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .showcase-card:hover::before {
+        opacity: 1;
+    }
+
+    .showcase-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 16px;
+        background: linear-gradient(135deg, rgba(255, 138, 0, 0.1), rgba(37, 99, 235, 0.1));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        color: var(--primary-light);
+        margin-bottom: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+    }
+
+    /* Statistics Ribbon */
+    .stats-ribbon {
+        background: linear-gradient(90deg, rgba(255, 138, 0, 0.05), rgba(37, 99, 235, 0.05));
+        border-top: 1px solid var(--border-subtle);
+        border-bottom: 1px solid var(--border-subtle);
+        padding: 60px 0;
+        margin: 80px 0;
+    }
+
+    .stats-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 30px;
+        text-align: center;
+    }
+
+    .stat-number {
+        font-size: 4rem;
+        font-weight: 800;
+        background: linear-gradient(135deg, var(--text-primary), var(--text-muted));
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        margin-bottom: 8px;
+        line-height: 1;
+    }
+
+    .stat-label {
+        font-size: 14px;
+        color: var(--text-dim);
+        text-transform: uppercase;
+        letter-spacing: 0.1em;
+        font-weight: 700;
+    }
+
+    @media (max-width: 768px) {
+        .stats-grid {
+            grid-template-columns: 1fr;
+            gap: 40px;
+        }
+    }
+</style>
+
+<!-- Hero Section -->
+<section class="hero-landing">
+    <!-- Animated AI Network Canvas -->
+    <canvas id="network-canvas"></canvas>
+
+    <div class="hero-content reveal">
+        <div class="section-tag" style="margin: 0 auto 24px;">
+            <span class="pulse-dot" style="background: var(--success); box-shadow: 0 0 10px var(--success);"></span>
+            Smart Eligibility Matching
+        </div>
+
+        <h1 class="hero-title reveal reveal-delay-1">
+            Discover Govt Benefits You <br>
+            <span class="highlight">Must Deserve</span>
+        </h1>
+
+        <p class="hero-subtitle reveal reveal-delay-2">
+            Our AI engine instantly matches your sociodemographic profile against thousands of verified state and
+            central government schemes, so you never miss out on financial support again.
+        </p>
+
+        <div class="cta-group reveal reveal-delay-3">
+            <a href="/find-schemes" class="btn btn-primary btn-xl">
+                Find Your Schemes Now <i class="fa-solid fa-arrow-right" style="margin-left: 8px;"></i>
+            </a>
+            <a href="/tech" class="btn btn-secondary btn-xl">
+                <i class="fa-solid fa-code"></i> Architecture
+            </a>
+            <a href="/team" class="btn btn-ghost btn-xl" style="border: 1px solid var(--border-subtle);">
+                <i class="fa-solid fa-users"></i> Meet the Team
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- Stats Ribbon -->
+<section class="stats-ribbon reveal">
+    <div class="pg-container">
+        <div class="stats-grid">
+            <div>
+                <div class="stat-number">20k+</div>
+                <div class="stat-label">Schemes Analyzed</div>
+            </div>
+            <div>
+                <div class="stat-number">92%</div>
+                <div class="stat-label">Matching Accuracy</div>
+            </div>
+            <div>
+                <div class="stat-number">14ms</div>
+                <div class="stat-label">Inference Speed</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Features Showcase -->
+<section id="why-prajaguide" class="showcase-section pg-container">
+    <div class="text-center reveal">
+        <div class="section-tag"><span class="dot"></span>Why PrajaGuide?</div>
+        <h2 style="font-size: clamp(2.5rem, 4vw, 3.5rem); margin-bottom: 20px;">Built for the Modern Citizen</h2>
+        <p style="color: var(--text-muted); font-size: 16px; max-width: 600px; margin: 0 auto;">No more scrolling
+            through endless PDF documents. Let our AI do the heavy lifting.</p>
+    </div>
+
+    <div class="showcase-grid">
+
+        <!-- Card 1 -->
+        <div class="showcase-card reveal reveal-delay-1">
+            <div class="showcase-icon"><i class="fa-solid fa-bolt"></i></div>
+            <h3 style="font-size: 20px; margin-bottom: 12px;">Instant AI Matching</h3>
+            <p style="color: var(--text-muted); line-height: 1.6; font-size: 15px;">
+                Answer 7 simple questions about your family and income. In milliseconds, our engine maps you to exact
+                schemes you qualify for.
+            </p>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="showcase-card reveal reveal-delay-2">
+            <div class="showcase-icon"><i class="fa-solid fa-shield-halved"></i></div>
+            <h3 style="font-size: 20px; margin-bottom: 12px;">100% Secure & Private</h3>
+            <p style="color: var(--text-muted); line-height: 1.6; font-size: 15px;">
+                We process your demographic data purely for matching. We don't store your personal identity, ensuring
+                total privacy.
+            </p>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="showcase-card reveal reveal-delay-3">
+            <div class="showcase-icon"><i class="fa-solid fa-money-bill-wave"></i></div>
+            <h3 style="font-size: 20px; margin-bottom: 12px;">Maximize Your Benefits</h3>
+            <p style="color: var(--text-muted); line-height: 1.6; font-size: 15px;">
+                Get exact estimates of the financial support available to you, and know precisely which documents you
+                need to apply successfully.
+            </p>
+        </div>
+
+    </div>
+</section>
+
+<script>
+    // ===========================================
+    // PREMIUM NETWORK CANVAS ANIMATION
+    // Represents Schemes Connecting to Citizens
+    // ============================================
+    const canvas = document.getElementById('network-canvas');
+    if (canvas) {
+        const ctx = canvas.getContext('2d');
+        let width = canvas.width = window.innerWidth;
+        let height = canvas.height = window.innerHeight;
+
+        const particles = [];
+        const particleCount = window.innerWidth < 768 ? 40 : 80;
+
+        class Particle {
+            constructor() {
+                this.x = Math.random() * width;
+                this.y = Math.random() * height;
+                this.vx = (Math.random() - 0.5) * 1.5;
+                this.vy = (Math.random() - 0.5) * 1.5;
+                this.radius = Math.random() * 2 + 1;
+                // Emerald to Saffron/Gold
+                // Saffron to White/Navy
+                const isSaffron = Math.random() > 0.5;
+                if (isSaffron) {
+                    this.color = `rgba(255, ${100 + Math.random() * 80}, 0, ${Math.random() * 0.5 + 0.3})`;
+                } else {
+                    this.color = `rgba(255, 255, 255, ${Math.random() * 0.4 + 0.2})`;
+                }
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+
+                // Bounce off edges softly
+                if (this.x < 0 || this.x > width) this.vx *= -1;
+                if (this.y < 0 || this.y > height) this.vy *= -1;
+            }
+
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.fill();
+            }
+        }
+
+        for (let i = 0; i < particleCount; i++) {
+            particles.push(new Particle());
+        }
+
+        function animate() {
+            ctx.clearRect(0, 0, width, height);
+
+            // Update & Draw Particles
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+
+                // Draw Connections
+                for (let j = i + 1; j < particles.length; j++) {
+                    const dx = particles[i].x - particles[j].x;
+                    const dy = particles[i].y - particles[j].y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < 120) {
+                        ctx.beginPath();
+                        ctx.strokeStyle = `rgba(255, 138, 0, ${0.15 - distance / 800})`;
+                        ctx.lineWidth = 1;
+                        ctx.moveTo(particles[i].x, particles[i].y);
+                        ctx.lineTo(particles[j].x, particles[j].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+            requestAnimationFrame(animate);
+        }
+
+        animate();
+
+        window.addEventListener('resize', () => {
+            width = canvas.width = window.innerWidth;
+            height = canvas.height = window.innerHeight;
+        });
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,598 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* PREMIUM PRESENTATION CSS */
+    :root {
+        --pres-bg: #0b0f19;
+        --pres-surface: #121826;
+        --pres-card: #182133;
+        --pres-border: rgba(255, 255, 255, 0.08);
+        --pres-primary: #3b82f6;
+        --pres-primary-glow: rgba(59, 130, 246, 0.4);
+        --pres-accent: #8b5cf6;
+        --pres-success: #10b981;
+        --pres-text-main: #f8fafc;
+        --pres-text-muted: #94a3b8;
+    }
+
+    body {
+        background-color: var(--pres-bg);
+        color: var(--pres-text-main);
+    }
+
+    .presentation-wrapper {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 80px 24px;
+        counter-reset: step-counter;
+        overflow: hidden;
+    }
+
+    /* TYPOGRAPHY & HEADINGS */
+    .pres-header {
+        text-align: center;
+        margin-bottom: 80px;
+    }
+
+    .pres-header h1 {
+        font-size: 4rem;
+        font-weight: 800;
+        letter-spacing: -0.05em;
+        margin-bottom: 24px;
+        background: linear-gradient(135deg, #fff, #94a3b8);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .pres-header p {
+        font-size: 1.25rem;
+        color: var(--pres-text-muted);
+        max-width: 700px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    /* SECTIONS */
+    .pres-section {
+        margin-bottom: 120px;
+        position: relative;
+        opacity: 0;
+        transform: translateY(40px);
+        transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .pres-section.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .section-title {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 40px;
+    }
+
+    .section-number {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 48px;
+        height: 48px;
+        background: linear-gradient(135deg, var(--pres-primary), var(--pres-accent));
+        border-radius: 12px;
+        font-size: 1.5rem;
+        color: white;
+        counter-increment: step-counter;
+        content: counter(step-counter);
+        box-shadow: 0 0 24px var(--pres-primary-glow);
+    }
+
+    .section-number::before {
+        content: "0" counter(step-counter);
+    }
+
+    /* FLOW LAYOUTS */
+    .flow-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 32px;
+        position: relative;
+    }
+
+    /* CARDS */
+    .pres-card {
+        background: var(--pres-card);
+        border: 1px solid var(--pres-border);
+        border-radius: 24px;
+        padding: 40px 32px;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.4s ease;
+        backdrop-filter: blur(20px);
+        z-index: 2;
+    }
+
+    .pres-card:hover {
+        transform: translateY(-8px);
+        border-color: var(--pres-primary);
+        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5), 0 0 20px var(--pres-primary-glow);
+    }
+
+    .pres-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--pres-primary), var(--pres-accent));
+        opacity: 0;
+        transition: opacity 0.4s ease;
+    }
+
+    .pres-card:hover::before {
+        opacity: 1;
+    }
+
+    .card-icon {
+        width: 64px;
+        height: 64px;
+        border-radius: 16px;
+        background: rgba(255, 255, 255, 0.05);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        color: var(--pres-primary);
+        margin-bottom: 24px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        transition: all 0.4s ease;
+    }
+
+    .pres-card:hover .card-icon {
+        background: var(--pres-primary);
+        color: white;
+        transform: scale(1.1) rotate(5deg);
+    }
+
+    .pres-card h3 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        margin-bottom: 16px;
+    }
+
+    .pres-card p {
+        color: var(--pres-text-muted);
+        line-height: 1.7;
+        font-size: 1.05rem;
+    }
+
+    /* CONNECTORS (Desktop mainly) */
+    .connector-line {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        right: 0;
+        height: 2px;
+        background: linear-gradient(90deg, transparent, rgba(59, 130, 246, 0.5), transparent);
+        z-index: 1;
+        transform: translateY(-50%);
+        pointer-events: none;
+        overflow: hidden;
+    }
+
+    @media (max-width: 900px) {
+        .connector-line {
+            display: none;
+        }
+    }
+
+    .connector-particle {
+        position: absolute;
+        top: -3px;
+        left: -10px;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: #fff;
+        box-shadow: 0 0 10px #fff, 0 0 20px var(--pres-primary);
+        animation: slideParticle 3s infinite linear;
+    }
+
+    @keyframes slideParticle {
+        0% {
+            left: 0%;
+            opacity: 0;
+        }
+
+        10% {
+            opacity: 1;
+        }
+
+        90% {
+            opacity: 1;
+        }
+
+        100% {
+            left: 100%;
+            opacity: 0;
+        }
+    }
+
+    /* DATA FLOW VISUALIZATION */
+    .code-block {
+        background: #0d1117;
+        border: 1px solid var(--pres-border);
+        border-radius: 12px;
+        padding: 16px;
+        font-family: 'Courier New', Courier, monospace;
+        font-size: 0.9rem;
+        color: #e6edf3;
+        margin-top: 24px;
+        overflow-x: auto;
+    }
+
+    .code-line {
+        margin-bottom: 8px;
+    }
+
+    .keyword {
+        color: #ff7b72;
+    }
+
+    .string {
+        color: #a5d6ff;
+    }
+
+    .comment {
+        color: #8b949e;
+    }
+
+    .function {
+        color: #d2a8ff;
+    }
+
+    /* PIPELINE DIAGRAM */
+    .pipeline-wrapper {
+        background: var(--pres-surface);
+        border: 1px solid var(--pres-border);
+        border-radius: 24px;
+        padding: 60px 40px;
+        display: flex;
+        flex-direction: column;
+        gap: 40px;
+    }
+
+    .pipeline-step {
+        display: flex;
+        align-items: center;
+        gap: 32px;
+        padding: 24px;
+        background: var(--pres-card);
+        border-radius: 16px;
+        border: 1px solid transparent;
+        transition: all 0.3s ease;
+        position: relative;
+    }
+
+    .pipeline-step:hover {
+        border-color: var(--pres-border);
+        background: rgba(255, 255, 255, 0.03);
+    }
+
+    .step-indicator {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: rgba(59, 130, 246, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 24px;
+        color: var(--pres-primary);
+        flex-shrink: 0;
+        position: relative;
+    }
+
+    .pipeline-step:not(:last-child)::after {
+        content: '';
+        position: absolute;
+        bottom: -40px;
+        left: 54px;
+        width: 2px;
+        height: 40px;
+        background: dashed 2px var(--pres-border);
+    }
+
+    .step-content h4 {
+        font-size: 1.25rem;
+        margin-bottom: 8px;
+        color: #fff;
+    }
+
+    .step-content p {
+        color: var(--pres-text-muted);
+        line-height: 1.6;
+        font-size: 0.95rem;
+    }
+
+    /* INTERACTIVE TAGS */
+    .tag-container {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        margin-top: 16px;
+    }
+
+    .tech-tag {
+        padding: 6px 12px;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid var(--pres-border);
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: var(--pres-text-muted);
+        transition: all 0.2s;
+        cursor: default;
+    }
+
+    .tech-tag:hover {
+        background: var(--pres-primary);
+        color: white;
+        border-color: var(--pres-primary);
+    }
+</style>
+
+<div class="presentation-wrapper">
+
+    <!-- HEADER -->
+    <div class="pres-header">
+        <div class="inline-block px-4 py-2 rounded-full mb-6"
+            style="background: rgba(59,130,246,0.1); border: 1px solid rgba(59,130,246,0.2); color: #3b82f6; font-weight: 600; font-size: 0.9rem; letter-spacing: 0.05em; display: inline-block;">
+            <i class="fa-solid fa-microchip mr-2"></i> SYSTEM ARCHITECTURE
+        </div>
+        <h1>How PrajaGuide Works</h1>
+        <p>A deep dive into the intelligent engine powering our citizen-to-scheme matching platform. From raw user data
+            to deterministic output.</p>
+    </div>
+
+    <!-- 1. PROJECT OVERVIEW -->
+    <section class="pres-section">
+        <h2 class="section-title">
+            <div class="section-number"></div> Project Overview
+        </h2>
+
+        <div class="flow-grid">
+            <div class="connector-line">
+                <div class="connector-particle"></div>
+            </div>
+
+            <div class="pres-card">
+                <div class="card-icon"><i class="fa-solid fa-user-astronaut"></i></div>
+                <h3>1. Profile Ingestion</h3>
+                <p>Users provide their demographic data, socio-economic status, and specific needs through a
+                    conversational UI. We collect over 30 distinct data points.</p>
+            </div>
+
+            <div class="pres-card" style="margin-top: 40px;">
+                <div class="card-icon"><i class="fa-solid fa-brain"></i></div>
+                <h3>2. AI & Rule Processing</h3>
+                <p>The system passes the profile through a Natural Language Processor, a Bi-LSTM Neural Network, and a
+                    deterministic Rule Engine concurrently.</p>
+            </div>
+
+            <div class="pres-card" style="margin-top: 80px;">
+                <div class="card-icon"><i class="fa-solid fa-clipboard-check"></i></div>
+                <h3>3. Precision Matching</h3>
+                <p>The final output is a highly curated list of government schemes, ranked by an eligibility score,
+                    complete with AI-generated explanations.</p>
+            </div>
+        </div>
+    </section>
+
+    <!-- 2. NLP FLOW -->
+    <section class="pres-section">
+        <h2 class="section-title">
+            <div class="section-number"></div> NLP Data Processing
+        </h2>
+        <div class="pipeline-wrapper">
+            <p style="color: var(--pres-text-muted); font-size: 1.1rem; max-width: 800px;">Before the AI can understand
+                the citizen's profile, the raw input text must be structured and normalized. Here is the exact
+                preprocessing pipeline applied in real-time.</p>
+
+            <div class="pipeline-step">
+                <div class="step-indicator"><i class="fa-solid fa-broom"></i></div>
+                <div class="step-content">
+                    <h4>Step 1: Text Sanitization</h4>
+                    <p>Lowercasing, regex filtering <code style="color: #a5d6ff;">[^a-z0-9\s]</code> to remove special
+                        characters, and collapsing multiple spaces to ensure clean input data.</p>
+                </div>
+            </div>
+
+            <div class="pipeline-step">
+                <div class="step-indicator"><i class="fa-solid fa-scissors"></i></div>
+                <div class="step-content">
+                    <h4>Step 2: Tokenization</h4>
+                    <p>Using a pre-trained Keras Tokenizer (<code style="color: #a5d6ff;">tokenizer.pickle</code>)
+                        mapping over 20,000 unique semantic tokens from the Indian government scheme corpus.</p>
+                </div>
+            </div>
+
+            <div class="pipeline-step">
+                <div class="step-indicator"><i class="fa-solid fa-ruler-horizontal"></i></div>
+                <div class="step-content">
+                    <h4>Step 3: Sequence Padding</h4>
+                    <p>Sequences are standardized to exactly 250 timesteps using <code
+                            style="color: #a5d6ff;">pad_sequences(maxlen=250, padding='post', truncating='post')</code>
+                        preparing it for the Neural Network.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 3. ML MODEL PIPELINE -->
+    <section class="pres-section">
+        <h2 class="section-title">
+            <div class="section-number"></div> ML Model Pipeline
+        </h2>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: start;">
+            <div class="pres-card">
+                <h3 style="color: var(--pres-primary); font-size: 1.8rem;">Bi-LSTM Engine</h3>
+                <p style="margin-bottom: 24px; font-size: 1.1rem;">Our AI model utilizes a Bidirectional Long Short-Term
+                    Memory (Bi-LSTM) architecture to predict missing categories based on user context.</p>
+
+                <ul
+                    style="list-style: none; padding: 0; color: var(--pres-text-muted); display: flex; flex-direction: column; gap: 16px;">
+                    <li style="display: flex; align-items: center; gap: 12px;">
+                        <i class="fa-solid fa-check-circle" style="color: var(--pres-success);"></i>
+                        <strong>100-Dimensional Vector Space</strong> for deep semantic mapping.
+                    </li>
+                    <li style="display: flex; align-items: center; gap: 12px;">
+                        <i class="fa-solid fa-check-circle" style="color: var(--pres-success);"></i>
+                        <strong>128 Recurrent Units</strong> capturing forward and backward context.
+                    </li>
+                    <li style="display: flex; align-items: center; gap: 12px;">
+                        <i class="fa-solid fa-check-circle" style="color: var(--pres-success);"></i>
+                        <strong>Multi-Label Classification</strong> threshold at 0.20 probability.
+                    </li>
+                </ul>
+
+                <div class="tag-container">
+                    <span class="tech-tag">TensorFlow</span>
+                    <span class="tech-tag">Keras</span>
+                    <span class="tech-tag">HDF5 (.h5)</span>
+                    <span class="tech-tag">Pickle</span>
+                </div>
+            </div>
+
+            <!-- Animated Terminal / Code Vis -->
+            <div class="code-block" style="height: 100%;">
+                <div class="code-line"><span class="comment"># ML Inference Execution</span></div>
+                <div class="code-line"><span class="keyword">def</span> <span
+                        class="function">predict_category</span>(user_text):</div>
+                <div class="code-line"> <span class="comment"># 1. Clean & Tokenize</span></div>
+                <div class="code-line"> cleaned = clean_text(user_text)</div>
+                <div class="code-line"> padded = pad_sequences(seq, maxlen=<span class="string">250</span>)</div>
+                <br>
+                <div class="code-line"> <span class="comment"># 2. Model Prediction</span></div>
+                <div class="code-line"> probs = model.predict(padded)[<span class="string">0</span>]</div>
+                <br>
+                <div class="code-line"> <span class="comment"># 3. Multi-label Thresholding</span></div>
+                <div class="code-line"> results = []</div>
+                <div class="code-line"> <span class="keyword">for</span> index, prob <span class="keyword">in</span>
+                    enumerate(probs):</div>
+                <div class="code-line"> <span class="keyword">if</span> prob > <span class="string">0.20</span>:</div>
+                <div class="code-line"> results.append(label_encoder.classes_[index])</div>
+                <br>
+                <div class="code-line"> <span class="keyword">return</span> sort_by_confidence(results)</div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. DETERMINISTIC RULE ENGINE -->
+    <section class="pres-section">
+        <h2 class="section-title">
+            <div class="section-number"></div> Result Generation Logic
+        </h2>
+        <div class="pres-card" style="padding: 40px;">
+            <p style="font-size: 1.15rem; color: var(--pres-text-muted); margin-bottom: 32px;">The ML parameters are
+                passed to a highly complex Deterministic Rule Engine that enforces government guidelines strictly.</p>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 24px;">
+                <div
+                    style="background: rgba(255,255,255,0.02); border: 1px solid var(--pres-border); padding: 24px; border-radius: 16px;">
+                    <h4 style="color: #ef4444; margin-bottom: 12px; display: flex; align-items: center; gap: 8px;"><i
+                            class="fa-solid fa-ban"></i> Hard Rejection Filters</h4>
+                    <ul
+                        style="color: var(--pres-text-muted); font-size: 0.95rem; line-height: 1.6; padding-left: 16px;">
+                        <li>State/Region mismatches</li>
+                        <li>Gender-exclusive schemes</li>
+                        <li>Caste restrictions (e.g., SC/ST only)</li>
+                        <li>Strict Age & Income bounds parsed via Regex</li>
+                        <li>Occupation requirements (e.g., Farmer only)</li>
+                    </ul>
+                </div>
+
+                <div
+                    style="background: rgba(255,255,255,0.02); border: 1px solid var(--pres-border); padding: 24px; border-radius: 16px;">
+                    <h4
+                        style="color: var(--pres-accent); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-star"></i> Scoring Algorithm
+                    </h4>
+                    <ul
+                        style="color: var(--pres-text-muted); font-size: 0.95rem; line-height: 1.6; padding-left: 16px;">
+                        <li><strong>+100</strong> Primary Need Match</li>
+                        <li><strong>+50</strong> State Match</li>
+                        <li><strong>+40</strong> Occupation Specifics</li>
+                        <li><strong>+20-35</strong> Vulnerability Bonus (Widow, Kutcha House, Single Parent)</li>
+                        <li><strong>+25</strong> AI Category Match</li>
+                    </ul>
+                </div>
+
+                <div
+                    style="background: rgba(255,255,255,0.02); border: 1px solid var(--pres-border); padding: 24px; border-radius: 16px;">
+                    <h4
+                        style="color: var(--pres-success); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;">
+                        <i class="fa-solid fa-wand-magic-sparkles"></i> Final Enrichment
+                    </h4>
+                    <p style="color: var(--pres-text-muted); font-size: 0.95rem; line-height: 1.6;">Scores are
+                        normalized to a 60-100% scale. The engine generates dynamic, tailored <strong>AI
+                            Explanations</strong>, strictly assigns required <strong>Documents</strong>, and estimates
+                        <strong>Financial Benefits</strong> via Regex extraction.
+                    </p>
+                </div>
+            </div>
+        </div>
+        <!-- FINAL CTA -->
+        <section class="pres-section" style="text-align: center; margin-top: 80px;">
+            <div class="pres-card" style="display: inline-block; padding: 60px 80px; max-width: 800px;">
+                <h2 style="font-size: 2.5rem; margin-bottom: 20px;">Built with Intelligence & Care</h2>
+                <p style="margin-bottom: 32px; font-size: 1.1rem;">PrajaGuide is the result of continuous field research
+                    and technical engineering.</p>
+                <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+                    <a href="/find-schemes" class="btn btn-primary btn-xl">
+                        <i class="fa-solid fa-search mr-2"></i> Start Matching
+                    </a>
+                    <a href="/team" class="btn btn-secondary btn-xl"
+                        style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6; border-color: rgba(139, 92, 246, 0.2); text-decoration: none; border-radius: 50px; padding: 18px 40px; font-weight: 600;">
+                        <i class="fa-solid fa-users mr-2"></i> Meet the Creators
+                    </a>
+                </div>
+            </div>
+        </section>
+
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Scroll Reveal Animation Script
+        const sections = document.querySelectorAll('.pres-section');
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, {
+            threshold: 0.1,
+            rootMargin: "0px 0px -50px 0px"
+        });
+
+        sections.forEach(section => {
+            observer.observe(section);
+        });
+
+        // Staggered delay for early elements
+        setTimeout(() => {
+            if (sections[0]) sections[0].classList.add('visible');
+        }, 200);
+    });
+</script>
+{% endblock %}

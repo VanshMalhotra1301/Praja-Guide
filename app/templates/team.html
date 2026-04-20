@@ -1,0 +1,325 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    /* PREMIUM TEAM CSS */
+    :root {
+        --team-bg: #0b0f19;
+        --team-surface: #121826;
+        --team-card: #182133;
+        --team-border: rgba(255, 255, 255, 0.08);
+        --team-primary: #3b82f6;
+        --team-primary-glow: rgba(59, 130, 246, 0.4);
+        --team-accent: #8b5cf6;
+        --team-text-main: #f8fafc;
+        --team-text-muted: #94a3b8;
+    }
+
+    body {
+        background-color: var(--team-bg);
+        color: var(--team-text-main);
+    }
+
+    .team-wrapper {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 100px 24px;
+    }
+
+    /* HEADER */
+    .team-header {
+        text-align: center;
+        margin-bottom: 80px;
+        opacity: 0;
+        transform: translateY(20px);
+        animation: fadeUp 1s forwards ease-out;
+    }
+
+    @keyframes fadeUp {
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .team-header h1 {
+        font-size: 3.5rem;
+        font-weight: 800;
+        letter-spacing: -0.05em;
+        margin-bottom: 16px;
+        background: linear-gradient(135deg, #fff, #94a3b8);
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+    }
+
+    .team-header p {
+        font-size: 1.25rem;
+        color: var(--team-text-muted);
+        max-width: 600px;
+        margin: 0 auto;
+        line-height: 1.6;
+    }
+
+    .tag-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 16px;
+        border-radius: 30px;
+        background: rgba(59, 130, 246, 0.1);
+        border: 1px solid rgba(59, 130, 246, 0.2);
+        color: #3b82f6;
+        font-weight: 600;
+        font-size: 0.9rem;
+        letter-spacing: 0.05em;
+        margin-bottom: 24px;
+        text-transform: uppercase;
+    }
+
+    .dot {
+        width: 8px;
+        height: 8px;
+        background: var(--team-primary);
+        border-radius: 50%;
+        box-shadow: 0 0 10px var(--team-primary);
+    }
+
+    /* GRID */
+    .team-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 32px;
+    }
+
+    /* CARDS */
+    .card-wrapper {
+        opacity: 0;
+        transform: translateY(40px);
+        transition: all 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+
+    .card-wrapper.visible {
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .team-card {
+        background: var(--team-card);
+        border: 1px solid var(--team-border);
+        border-radius: 24px;
+        padding: 48px 32px;
+        text-align: center;
+        position: relative;
+        overflow: hidden;
+        transition: all 0.4s ease;
+        backdrop-filter: blur(20px);
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .team-card:hover {
+        transform: translateY(-8px);
+        border-color: var(--team-primary);
+        box-shadow: 0 20px 40px -10px rgba(0, 0, 0, 0.5), 0 0 20px var(--team-primary-glow);
+    }
+
+    .team-card::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 4px;
+        background: linear-gradient(90deg, var(--team-primary), var(--team-accent));
+        opacity: 0;
+        transition: opacity 0.4s ease;
+    }
+
+    .team-card:hover::before {
+        opacity: 1;
+    }
+
+    .avatar-wrapper {
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.03);
+        border: 2px solid var(--team-border);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        color: var(--team-primary);
+        margin-bottom: 24px;
+        transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+        position: relative;
+    }
+
+    .team-card:hover .avatar-wrapper {
+        border-color: var(--team-primary);
+        color: white;
+        background: var(--team-primary);
+        box-shadow: 0 0 30px var(--team-primary-glow);
+        transform: scale(1.1);
+    }
+
+    .team-name {
+        font-size: 1.6rem;
+        font-weight: 800;
+        margin-bottom: 8px;
+        color: var(--team-text-main);
+    }
+
+    .team-role {
+        font-size: 0.85rem;
+        color: var(--team-accent);
+        text-transform: uppercase;
+        letter-spacing: 0.15em;
+        font-weight: 700;
+        margin-bottom: 20px;
+    }
+
+    .team-desc {
+        color: var(--team-text-muted);
+        line-height: 1.7;
+        font-size: 1.05rem;
+        margin-bottom: 32px;
+        flex-grow: 1;
+    }
+
+    /* SOCIALS */
+    .social-links {
+        display: flex;
+        gap: 16px;
+        justify-content: center;
+    }
+
+    .social-link {
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.05);
+        color: var(--team-text-muted);
+        font-size: 18px;
+        transition: all 0.3s ease;
+        text-decoration: none;
+    }
+
+    .social-link:hover {
+        background: var(--team-primary);
+        color: white;
+        transform: translateY(-4px);
+    }
+
+    /* Floating blobs for background */
+    .blob {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(80px);
+        z-index: -1;
+        opacity: 0.5;
+        pointer-events: none;
+    }
+
+    .blob-1 {
+        top: 10%;
+        left: 10%;
+        width: 300px;
+        height: 300px;
+        background: rgba(59, 130, 246, 0.15);
+    }
+
+    .blob-2 {
+        bottom: 10%;
+        right: 10%;
+        width: 400px;
+        height: 400px;
+        background: rgba(139, 92, 246, 0.15);
+    }
+</style>
+
+<div class="blob blob-1"></div>
+<div class="blob blob-2"></div>
+
+<div class="team-wrapper">
+    <div class="team-header">
+        <div class="tag-label"><span class="dot"></span> Architects</div>
+        <h1>Meet the Builders</h1>
+        <p>The engineering team designing the future of algorithmic welfare distribution in India.</p>
+    </div>
+
+    <div class="team-grid">
+
+        <!-- Vansh -->
+        <div class="card-wrapper" style="transition-delay: 100ms;">
+            <div class="team-card">
+                <div class="avatar-wrapper"><i class="fa-solid fa-code"></i></div>
+                <h3 class="team-name">Vansh Malhotra</h3>
+                <div class="team-role">AI / ML Architect</div>
+                <p class="team-desc">Lead engineer behind the Bi-LSTM model design, data normalization pipelines, and
+                    the core backend artificial intelligence infrastructure.</p>
+                <div class="social-links">
+                    <a href="#" class="social-link"><i class="fa-brands fa-github"></i></a>
+                    <a href="https://www.linkedin.com/in/vanshmalhotra1301" target="_blank" class="social-link"><i
+                            class="fa-brands fa-linkedin-in"></i></a>
+                    <a href="#" class="social-link"><i class="fa-brands fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Dhruv -->
+        <div class="card-wrapper" style="transition-delay: 200ms;">
+            <div class="team-card">
+                <div class="avatar-wrapper"><i class="fa-solid fa-server"></i></div>
+                <h3 class="team-name">Dhruv Ashish</h3>
+                <div class="team-role">Backend Systems</div>
+                <p class="team-desc">Orchestrated the deterministic rule-engine, high-performance API endpoints, and
+                    scalable database architecture.</p>
+                <div class="social-links">
+                    <a href="#" class="social-link"><i class="fa-brands fa-github"></i></a>
+                    <a href="https://www.linkedin.com/in/dhruv-ashish-99191a309" target="_blank" class="social-link"><i
+                            class="fa-brands fa-linkedin-in"></i></a>
+                    <a href="#" class="social-link"><i class="fa-brands fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Shreya -->
+        <div class="card-wrapper" style="transition-delay: 300ms;">
+            <div class="team-card">
+                <div class="avatar-wrapper"><i class="fa-solid fa-paintbrush"></i></div>
+                <h3 class="team-name">Shreya Desai</h3>
+                <div class="team-role">UI / UX Design</div>
+                <p class="team-desc">Crafted the premium SaaS aesthetic, responsive layouts, and the citizen-friendly
+                    intuitive matching workflows.</p>
+                <div class="social-links">
+                    <a href="#" class="social-link"><i class="fa-brands fa-dribbble"></i></a>
+                    <a href="https://www.linkedin.com/in/shreya-desai-445304327" target="_blank" class="social-link"><i
+                            class="fa-brands fa-linkedin-in"></i></a>
+                    <a href="#" class="social-link"><i class="fa-brands fa-twitter"></i></a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // Scroll Reveal 
+        const cards = document.querySelectorAll('.card-wrapper');
+
+        setTimeout(() => {
+            cards.forEach((card) => {
+                card.classList.add('visible');
+            });
+        }, 100);
+    });
+</script>
+{% endblock %}

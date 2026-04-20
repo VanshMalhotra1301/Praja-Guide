@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PrajaGuide AI — Government Benefit Eligibility Engine</title>
+    <meta name="description"
+        content="AI-powered eligibility matching for 500+ Indian government schemes. Discover benefits you qualify for in under 3 minutes.">
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <!-- Design System -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+
+    <!-- Mode Enforcement (Official Midnight Theme) -->
+    <script>
+        document.documentElement.setAttribute('data-theme', 'dark');
+    </script>
+</head>
+
+<body>
+
+    <!-- Ambient Background -->
+    <div class="pg-ambient" aria-hidden="true">
+        <div class="pg-ambient-orb pg-ambient-orb-1"></div>
+        <div class="pg-ambient-orb pg-ambient-orb-2"></div>
+    </div>
+
+    <!-- Cursor Glow -->
+    <div id="cursor-glow" aria-hidden="true"></div>
+
+    <!-- Navigation -->
+    <nav class="pg-nav" role="navigation" aria-label="Main navigation">
+        <a href="/" class="nav-logo" aria-label="PrajaGuide Home">
+            <div class="nav-logo-icon">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.25C17.25 22.15 21 17.25 21 12V7l-9-5z" />
+                </svg>
+            </div>
+            <div class="nav-brand">
+                <span class="nav-brand-name">Praja<span style="color: var(--primary-light)">Guide</span></span>
+                <span class="nav-brand-tag">For Citizens</span>
+            </div>
+        </a>
+
+        <div class="nav-links">
+            <a href="/find-schemes" class="nav-link">Find Schemes</a>
+            <a href="/#why-prajaguide" class="nav-link">Why PrajaGuide?</a>
+            <a href="/tech" class="nav-link">Platform Tech</a>
+            <button id="theme-toggle" class="theme-btn" title="Toggle theme" aria-label="Toggle light/dark mode">
+                <span id="theme-icon">🌙</span>
+            </button>
+            <a href="/find-schemes" class="nav-cta">
+                <i class="fa-solid fa-sparkles"></i>
+                Find My Benefits
+            </a>
+        </div>
+
+        <button class="nav-hamburger" id="nav-hamburger" aria-label="Open mobile menu">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content flex-grow">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="pg-footer">
+        <div class="pg-container">
+            <div class="footer-grid">
+                <!-- Brand -->
+                <div class="footer-brand">
+                    <div class="nav-logo">
+                        <div class="nav-logo-icon" style="width:32px;height:32px;">
+                            <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="width:16px;height:16px">
+                                <path d="M12 2L3 7v5c0 5.25 3.75 10.15 9 11.25C17.25 22.15 21 17.25 21 12V7l-9-5z" />
+                            </svg>
+                        </div>
+                        <span style="font-size:15px;font-weight:800;color:var(--text-primary)">PrajaGuide <span
+                                style="color:var(--primary-light)">AI</span></span>
+                    </div>
+                    <p>Simplifying government benefits. Find subsidies, pensions, and welfare programs you qualify for
+                        in minutes.</p>
+                </div>
+
+                <!-- Platform -->
+                <div>
+                    <div class="footer-col-title">Platform & Help</div>
+                    <ul class="footer-links">
+                        <li><a href="/find-schemes">Eligibility Engine</a></li>
+                        <li><a href="/#how-it-works">How It Works</a></li>
+                        <li><a href="/tech">Technical Analysis</a></li>
+                        <li><a href="#">Help Center</a></li>
+                    </ul>
+                </div>
+
+                <!-- Resources -->
+                <div>
+                    <div class="footer-col-title">Resources</div>
+                    <ul class="footer-links">
+                        <li><a href="#">Scheme Directory</a></li>
+                        <li><a href="#">Citizen Resources</a></li>
+                        <li><a href="#">Government APIs</a></li>
+                        <li><a href="#">Documentation</a></li>
+                    </ul>
+                </div>
+
+                <!-- Legal -->
+                <div>
+                    <div class="footer-col-title">Legal & Trust</div>
+                    <ul class="footer-links">
+                        <li><a href="#">Privacy Policy</a></li>
+                        <li><a href="#">Terms of Service</a></li>
+                        <li><a href="#" style="display:flex;align-items:center;gap:6px;"><i class="fa-solid fa-lock"
+                                    style="color:var(--success);font-size:10px;"></i> Secure Data</a></li>
+                        <li><a href="#">Open Source</a></li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="footer-bottom">
+                <p class="footer-legal">© 2026 PrajaGuide Foundation. Not an official government portal. For
+                    informational purposes only.</p>
+                <div class="footer-status">
+                    <span class="pulse-dot" style="width:6px;height:6px;display:inline-block;position:relative;"></span>
+                    100% Free & Secure
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Notification System -->
+    <div id="toast-container" class="pg-toast-container"></div>
+
+    <!-- Core JS -->
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+</body>
+
+</html>
