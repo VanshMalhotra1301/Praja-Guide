@@ -3,7 +3,7 @@ import os
 
 def create_app():
     app = Flask(__name__)
-    app.secret_key = os.urandom(24) # Required for session/flash messages
+    app.secret_key = os.environ.get('SECRET_KEY', 'praja-guide-default-dev-key-change-in-prod')
 
     # Register Main Blueprint
     from .routes import main
