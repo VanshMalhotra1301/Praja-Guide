@@ -2,149 +2,107 @@ import numpy as np
 import re
 import pickle
 import os
-os.environ.setdefault("KERAS_BACKEND", "jax")
-import keras
-from keras.models import load_model
-from keras.utils import pad_sequences
 
 # ==========================================
 # 1. SETUP & PATH CONFIGURATION
 # ==========================================
 
-# Get the directory where this file (ml_engine.py) is located (e.g., .../praja_guide/app)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
-
-# Go up one level to project root, then into 'models' (e.g., .../praja_guide/models)
 MODELS_DIR = os.path.join(os.path.dirname(BASE_DIR), 'models')
-
-# Define specific paths
-MODEL_PATH = os.path.join(MODELS_DIR, 'praja_guide_model.h5')
 TOKENIZER_PATH = os.path.join(MODELS_DIR, 'tokenizer.pickle')
 LABEL_ENCODER_PATH = os.path.join(MODELS_DIR, 'label_encoder.pickle')
 
 # Global artifacts
-model = None
 tokenizer = None
 label_encoder = None
-MAX_LEN = 250  # Must match the length used during training
+MAX_LEN = 250
 
 # ==========================================
-# 2. ARTIFACT LOADING
+# 2. KEYWORD-BASED CATEGORY MAPPING
+# (Lightweight replacement for LSTM model —
+#  avoids keras/jax which OOM-kill free tier)
 # ==========================================
 
-def load_ml_artifacts():
-    """
-    Loads the Keras model, Tokenizer, and Label Encoder from disk.
-    Handles missing files gracefully to prevent app crashes.
-    """
-    global model, tokenizer, label_encoder
-    
-    print(f"ML Engine: Looking for ML artifacts in: {MODELS_DIR}")
-
-    try:
-        # Check if files exist
-        if not (os.path.exists(MODEL_PATH) and os.path.exists(TOKENIZER_PATH) and os.path.exists(LABEL_ENCODER_PATH)):
-            print(f"WARNING: One or more model files missing. ML Engine will run in FALLBACK mode.")
-            return
-
-        # Load Tokenizer
-        with open(TOKENIZER_PATH, 'rb') as handle:
-            tokenizer = pickle.load(handle)
-
-        # Load Label Encoder
-        with open(LABEL_ENCODER_PATH, 'rb') as handle:
-            label_encoder = pickle.load(handle)
-
-        # Load Keras Model
-        model = load_model(MODEL_PATH)
-        
-        print("ML Engine: Model & Artifacts Loaded Successfully.")
-
-    except Exception as e:
-        print(f"ML Engine Error: Failed to load artifacts. {e}")
-        # Reset to None to ensure safety checks fail gracefully later
-        model = None
-        tokenizer = None
-        label_encoder = None
-
-# Initialize loading on module import
-load_ml_artifacts()
-
-# ==========================================
-# 3. PREPROCESSING & PREDICTION LOGIC
-# ==========================================
+CATEGORY_KEYWORDS = {
+    "Education": [
+        "student", "school", "college", "scholarship", "study", "education",
+        "learning", "university", "degree", "course", "tuition", "children studying"
+    ],
+    "Agriculture": [
+        "farmer", "agriculture", "farming", "crop", "land", "kisan", "seed",
+        "fertilizer", "irrigation", "livestock", "cattle", "animal husbandry",
+        "acres", "farm"
+    ],
+    "Health": [
+        "health", "hospital", "illness", "disease", "medical", "ayushman",
+        "insurance", "treatment", "doctor", "disability", "chronic", "sick"
+    ],
+    "Housing": [
+        "housing", "house", "home", "shelter", "kutcha", "rented", "awas",
+        "construction", "pucca", "accommodation"
+    ],
+    "Pension": [
+        "pension", "widow", "old age", "senior citizen", "retirement",
+        "elderly", "above 60", "widowed"
+    ],
+    "Employment": [
+        "employment", "job", "work", "unemployed", "job loss", "skill",
+        "training", "vocational", "self employed", "business", "startup",
+        "mudra", "msme", "entrepreneur"
+    ],
+    "Social Welfare": [
+        "bpl", "below poverty", "sc", "st", "obc", "minority", "dalit",
+        "tribal", "general welfare", "social support", "ration", "food"
+    ],
+    "Women Welfare": [
+        "women", "female", "girl", "mahila", "single parent", "maternity",
+        "widow", "self help group", "shg", "beti"
+    ],
+    "Disability": [
+        "disability", "disabled", "handicap", "divyang", "differently abled"
+    ],
+    "Financial Inclusion": [
+        "bank", "loan", "credit", "insurance", "mudra", "pm jan dhan",
+        "microfinance", "subsidy", "financial"
+    ],
+}
 
 def clean_text(text):
-    """
-    Standardizes input text: lowercase, remove special chars, normalize spaces.
-    """
+    """Standardizes input text."""
     if not text:
         return ""
     text = str(text).lower()
-    text = re.sub(r'[^a-z0-9\s]', '', text)  # Keep only alphanumeric and spaces
-    text = re.sub(r'\s+', ' ', text).strip() # Collapse multiple spaces
+    text = re.sub(r'[^a-z0-9\s]', '', text)
+    text = re.sub(r'\s+', ' ', text).strip()
     return text
 
 def predict_category(user_text):
     """
-    Analyzes the user profile text and predicts relevant scheme categories.
-    
+    Predicts relevant scheme categories using keyword matching.
+    Lightweight replacement for LSTM — no ML framework needed.
+
     Args:
-        user_text (str): The combined context string from the wizard (Age + Occ + Needs...).
-        
+        user_text (str): Combined context string from the wizard.
+
     Returns:
-        list: A list of predicted category strings (e.g., ['Education', 'Social Welfare']).
+        list: List of predicted category strings.
     """
-    # Default fallback if ML fails or isn't loaded
     default_categories = ["General Welfare", "Social Support"]
 
-    # 1. Safety Check
-    if model is None or tokenizer is None or label_encoder is None:
+    if not user_text:
         return default_categories
 
-    try:
-        # 2. Preprocess
-        cleaned_text = clean_text(user_text)
-        if not cleaned_text:
-            return default_categories
+    cleaned = clean_text(user_text)
+    matched = []
 
-        # 3. Tokenize & Pad
-        seq = tokenizer.texts_to_sequences([cleaned_text])
-        padded = pad_sequences(seq, maxlen=MAX_LEN, padding='post', truncating='post')
+    for category, keywords in CATEGORY_KEYWORDS.items():
+        score = sum(1 for kw in keywords if kw in cleaned)
+        if score > 0:
+            matched.append((category, score))
 
-        # 4. Model Inference
-        # Returns a probability array (e.g., [[0.1, 0.8, 0.05...]])
-        prediction_probs = model.predict(padded, verbose=0)[0]
-
-        # 5. Thresholding & Decoding
-        # We use a threshold to capture multiple relevant categories (Multi-label approach)
-        threshold = 0.20  # Adjustable: Lower = more suggestions, Higher = stricter
-        
-        results = []
-        for index, probability in enumerate(prediction_probs):
-            if probability > threshold:
-                # Map index back to class name
-                category_name = label_encoder.classes_[index]
-                results.append((category_name, probability))
-
-        # 6. Sort by Confidence
-        results.sort(key=lambda x: x[1], reverse=True)
-        
-        # Extract just the names
-        final_categories = [cat for cat, prob in results]
-
-        # Debugging Output (Optional)
-        # print(f"🔍 Input: {cleaned_text[:50]}...")
-        # print(f"🤖 Prediction: {final_categories}")
-
-        # Always return at least the top result or defaults if nothing crossed threshold
-        if not final_categories:
-            # Fallback: take the single highest probability class regardless of threshold
-            top_index = np.argmax(prediction_probs)
-            return [label_encoder.classes_[top_index]]
-
-        return final_categories
-
-    except Exception as e:
-        print(f"Prediction Runtime Error: {e}")
+    if not matched:
         return default_categories
+
+    # Sort by match score descending, return top categories
+    matched.sort(key=lambda x: x[1], reverse=True)
+    return [cat for cat, _ in matched[:5]]  # Return top 5 matches
