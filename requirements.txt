@@ -2,4 +2,4 @@ Flask
 gunicorn
 pandas==2.2.1
 scikit-learn==1.4.1.post1
-tensorflow==2.15.0
+tensorflow-cpu==2.15.0
