@@ -9,9 +9,4 @@ def create_app():
     from .routes import main
     app.register_blueprint(main)
 
-    # Register Chatbot Blueprint
-    # We import inside the function to avoid circular dependency issues
-    from chatbot.app import chatbot
-    app.register_blueprint(chatbot)
-
     return app
