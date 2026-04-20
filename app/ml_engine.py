@@ -5,7 +5,7 @@ import os
 os.environ.setdefault("KERAS_BACKEND", "jax")
 import keras
 from keras.models import load_model
-from keras.preprocessing.sequence import pad_sequences
+from keras.utils import pad_sequences
 
 # ==========================================
 # 1. SETUP & PATH CONFIGURATION

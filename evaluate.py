@@ -4,7 +4,7 @@ import os
 import pickle
 os.environ.setdefault("KERAS_BACKEND", "jax")
 import keras
-from keras.preprocessing.sequence import pad_sequences
+from keras.utils import pad_sequences
 from sklearn.metrics import classification_report, accuracy_score, hamming_loss, f1_score
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
