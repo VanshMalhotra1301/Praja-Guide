@@ -1,9 +1,10 @@
 import pandas as pd
 import numpy as np
-import tensorflow as tf
-import pickle
 import os
-from tensorflow.keras.preprocessing.sequence import pad_sequences
+import pickle
+os.environ.setdefault("KERAS_BACKEND", "jax")
+import keras
+from keras.preprocessing.sequence import pad_sequences
 from sklearn.metrics import classification_report, accuracy_score, hamming_loss, f1_score
 
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -13,7 +14,7 @@ LBL_PATH = os.path.join(BASE_DIR, 'models', 'label_encoder.pickle')
 DATA_PATH = os.path.join(BASE_DIR, 'data', 'updated_data.csv')
 
 print("--- Loading Model and Data ---")
-model = tf.keras.models.load_model(MODEL_PATH)
+model = keras.models.load_model(MODEL_PATH)
 with open(TOK_PATH, 'rb') as h:
     tokenizer = pickle.load(h)
 with open(LBL_PATH, 'rb') as h:
