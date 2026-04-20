@@ -1,5 +1,5 @@
 Flask
 gunicorn
-pandas
-scikit-learn
-tensorflow
+pandas==2.2.1
+scikit-learn==1.4.1.post1
+tensorflow==2.15.0
